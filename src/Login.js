@@ -1,8 +1,15 @@
 import 'antd/dist/antd.css';
 import './index.css';
 import { Link } from "react-router-dom";
+import { useHistory } from 'react-router-dom';
 import { Form, Input, Button, Checkbox } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import {
+  FirebaseAuthProvider,
+} from '@react-firebase/auth';
+import { firebaseConfig } from './firebase/firebaseConfig';
 
 
 function Login() {
@@ -11,7 +18,10 @@ function Login() {
     console.log('Received values of form: ', values);
   };
 
+  const history = useHistory() 
+
   return (
+    <FirebaseAuthProvider {...firebaseConfig} firebase={firebase}>
     <Form
       name="normal_login"
       className="login-form"
@@ -60,9 +70,33 @@ function Login() {
         <Button type="primary" htmlType="submit" className="login-form-button">
           Log in
         </Button>
+        <Button
+        type="primary" htmlType="submit" className="login-form-button"
+          onClick={() => {
+            const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(googleAuthProvider).then(() => {
+              history.goBack();
+            });
+          }}
+        >
+          Log In with Google
+        </Button>
+        <Button
+        type="primary" className="login-form-button"
+          onClick={() => {
+            firebase.auth().signOut().then(() => {
+              
+            }).catch((error) => {
+              
+            });
+          }}
+        >
+          Log Out
+        </Button>
         Dont have an account? <Link to="/signup">Sign up!</Link>
       </Form.Item>
     </Form>
+    </FirebaseAuthProvider>
   );
 
 }

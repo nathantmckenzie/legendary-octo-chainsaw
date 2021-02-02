@@ -10,14 +10,14 @@ import initialElements from "../Editor/initialElements";
 import "./provider.css";
 
 // Yjs Imports
-import * as Y from 'yjs';
-import { WebsocketProvider } from 'y-websocket';
+import * as Y from "yjs";
+import { WebsocketProvider } from "y-websocket";
 
 export default function YjsFlowTest() {
   //Fires when React flow has loaded
   const reactFlowRef = React.useRef(null);
   const onLoad = (reactFlowInstance) => {
-    console.log('flow loaded:', reactFlowInstance)
+    console.log("flow loaded:", reactFlowInstance);
     reactFlowRef.current = reactFlowInstance;
   };
 
@@ -26,28 +26,36 @@ export default function YjsFlowTest() {
   const nodeDraggingRef = React.useRef(null);
   const onDragRef = React.useRef((event) =>
     ydoc.current
-      .getMap('node-' + nodeDraggingRef.current)
-      .set('position', reactFlowRef.current.project({ x: event.clientX, y: event.clientY }))
+      .getMap("node-" + nodeDraggingRef.current)
+      .set(
+        "position",
+        reactFlowRef.current.project({ x: event.clientX, y: event.clientY })
+      )
   );
-  const onElementsRemove = (elementsToRemove) => setElements((els) => removeElements(elementsToRemove, els));
+  const onElementsRemove = (elementsToRemove) =>
+    setElements((els) => removeElements(elementsToRemove, els));
   const onConnect = (params) => setElements((els) => addEdge(params, els));
   React.useEffect(() => {
     ydoc.current = new Y.Doc();
-    new WebsocketProvider('ws://143.110.233.19/example', 'collab', ydoc.current);
-    const nodes = ydoc.current.getArray('all-nodes');
+    new WebsocketProvider(
+      "ws://143.110.233.19/example",
+      "collab",
+      ydoc.current
+    );
+    const nodes = ydoc.current.getArray("all-nodes");
     if (nodes.toArray().length === 0) {
       initialElements.forEach((element, index) => {
-        const node = ydoc.current.getMap('node-' + element.id);
+        const node = ydoc.current.getMap("node-" + element.id);
         for (let [k, v] of Object.entries(element)) {
           node.set(k, v);
           node.observe((event, transaction) => {
-            if (event.keysChanged.has('position')) {
+            if (event.keysChanged.has("position")) {
               setElements((elements) =>
                 elements.map((element) => {
-                  if (element.id === event.currentTarget.get('id')) {
+                  if (element.id === event.currentTarget.get("id")) {
                     return {
                       ...element,
-                      position: event.currentTarget.get('position'),
+                      position: event.currentTarget.get("position"),
                     };
                   }
                   return element;
@@ -64,11 +72,11 @@ export default function YjsFlowTest() {
   }, []);
   const onNodeDragStart = (event, node) => {
     nodeDraggingRef.current = node.id;
-    document.addEventListener('mousemove', onDragRef.current);
+    document.addEventListener("mousemove", onDragRef.current);
   };
   const onNodeDragStop = (event, node) => {
     nodeDraggingRef.current = node.id;
-    document.removeEventListener('mousemove', onDragRef.current);
+    document.removeEventListener("mousemove", onDragRef.current);
   };
 
   return (
@@ -84,14 +92,14 @@ export default function YjsFlowTest() {
         <MiniMap
           nodeStrokeColor={(n) => {
             if (n.style?.background) return n.style.background;
-            if (n.type === 'input') return '#0041d0';
-            if (n.type === 'output') return '#ff0072';
-            if (n.type === 'default') return '#1a192b';
-            return '#eee';
+            if (n.type === "input") return "#0041d0";
+            if (n.type === "output") return "#ff0072";
+            if (n.type === "default") return "#1a192b";
+            return "#eee";
           }}
           nodeColor={(n) => {
             if (n.style?.background) return n.style.background;
-            return '#fff';
+            return "#fff";
           }}
           nodeBorderRadius={2}
         />
